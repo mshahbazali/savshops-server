@@ -17,6 +17,7 @@ require("./src/db")
 app.use("/api/auth", require("./src/routes/auth"))
 app.use("/api/brand", require("./src/routes/brand"))
 app.use("/api/category", require("./src/routes/category"))
+app.use("/api/visit", require("./src/routes/visit"))
 
 http.listen(port, () => {
     console.log(`Server is running on ${port}`)
