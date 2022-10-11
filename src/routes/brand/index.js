@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { createBrand, getAllBrand, getBrand, updateBrand, deleteBrand } = require("../../controller/brand")
+const { createBrand, getAllBrand, getBrand, updateBrand, deleteBrand, getBrandData } = require("../../controller/brand")
 
 // Get All Brand Api
 
@@ -22,7 +22,11 @@ router.post("/update", updateBrand)
 
 // Delete Brand Api
 
-router.delete("/delete", deleteBrand)
+router.post("/delete", deleteBrand)
+
+// Get Brand Data Api
+
+router.get("/data", getBrandData)
 
 
 module.exports = router
