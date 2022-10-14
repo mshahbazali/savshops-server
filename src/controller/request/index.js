@@ -40,6 +40,59 @@ const getBrand = async (req, res) => {
 
 }
 
+const approve = async (req, res) => {
+    const { requestId, key } = req.headers
+    if (key == process.env.key_Brand) {
+        await requestSchema.findByIdAndUpdate({ _id: requestId }, { status: "Approved" }, { new: true }, (err, doc) => {
+            if (err) {
+                res.status(200).send({
+                    message: "Something Wrong",
+                    err: err.message
+                })
+            }
+            else {
+                res.status(200).send({
+                    message: "Request successfully approved",
+                    data: doc
+                })
+            }
+
+        })
+    }
+    else {
+        res.status(200).send({
+            message: "Key is not valid"
+        })
+    }
+
+}
 
 
-module.exports = { createRequest, getRequest, getBrand }
+const reject = async (req, res) => {
+    const { requestId, key } = req.headers
+    if (key == process.env.key_Brand) {
+        await requestSchema.findByIdAndUpdate({ _id: requestId }, { status: "Rejected" }, { new: true }, (err, doc) => {
+            if (err) {
+                res.status(200).send({
+                    message: "Something Wrong",
+                    err: err.message
+                })
+            }
+            else {
+                res.status(200).send({
+                    message: "Request successfully rejected",
+                    data: doc
+                })
+            }
+
+        })
+    }
+    else {
+        res.status(200).send({
+            message: "Key is not valid"
+        })
+    }
+}
+
+
+module.exports = { approve, reject, createRequest, getRequest, getBrand }

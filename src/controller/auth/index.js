@@ -69,15 +69,18 @@ const signin = async (req, res) => {
         await authSchema.findOne({ email: email })
             .then(async (user) => {
                 if (!user) {
-                    res.status(202).send("User Not Found")
+                    res.status(202).send({
+                        message: "Email not register"
+                    })
                 }
                 else {
                     await bcrypt.compare(req.body.password, user.password).then(async (pass) => {
                         if (pass) {
                             const token = await jwt.sign(user._id.toString(), process.env.JWT_KEY)
                             res.status(201).send({
-                                message: "user logged",
-                                token: token
+                                message: "Account successfully logged",
+                                token: token,
+                                userId: user._id.toString()
                             })
                         }
                         else {
@@ -90,6 +93,7 @@ const signin = async (req, res) => {
                 }
             })
             .catch(err => {
+                console.log(err);
                 res.status(201).send({ message: "User Not Found", user: 'false' })
             })
     }
