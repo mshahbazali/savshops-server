@@ -8,7 +8,7 @@ const withdrewSchema = mongoose.model("withdrew", mongoose.Schema({
     city: { type: String },
     postcode: { type: String },
     address: { type: String },
-    amount: { type: String },
+    amount: { type: Number },
     status: { type: String },
     method: { type: String },
 },

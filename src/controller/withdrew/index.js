@@ -1,4 +1,5 @@
 const withdrewSchema = require("../../schema/withdrew")
+const { authSchema } = require("../../schema/auth")
 const jwt = require('jsonwebtoken')
 const notificationSchema = require("../../schema/notification")
 const OneSignal = require('onesignal-node');
@@ -36,30 +37,44 @@ const approve = async (req, res) => {
     const { withdrewId } = req.body
     try {
         if (key == process.env.key_Brand) {
-            await withdrewSchema.findOneAndUpdate({ _id: withdrewId }, { status: "Completed" }, { new: true }, (err, doc) => {
+            await withdrewSchema.findOneAndUpdate({ _id: withdrewId }, { status: "Completed" }, { new: true }, async (err, doc) => {
                 if (err) {
-                    console.log(err)
                     res.status(200).send({
                         message: "Something Wrong",
                         err: err.message
                     })
                 }
                 else {
-                    const notification = {
-                        headings: { "en": "Withdrew successfully completed", },
-                        contents: {
-                            'en': "Withdrew successfully completed",
-                        },
-                        include_external_user_ids: [doc.userId],
-                    };
-                    const createNotification = new notificationSchema({ title: `${doc.amount} usd withdrew completed`, content: "Withdrew successfully completed", status: "Completed", userId: doc.userId, type: "withdrew" })
-                    createNotification.save().then(async () => {
-                        await client.createNotification(notification)
-                        res.status(200).send({
-                            message: "Withdrew successfully completed",
-                            data: doc
+                    try {
+                        await authSchema.findById({ _id: doc.userId }).then(async (data) => {
+                            await authSchema.findOneAndUpdate({ _id: data._id.toString() }, { totalEarning: data.totalEarning - doc.amount }, { new: true }, (err, data) => {
+                                if (!err) {
+                                    const notification = {
+                                        headings: { "en": "Withdrew successfully completed", },
+                                        contents: {
+                                            'en': "Withdrew successfully completed",
+                                        },
+                                        include_external_user_ids: [doc.userId],
+                                    };
+                                    const createNotification = new notificationSchema({ title: `${doc.amount} usd withdrew completed`, content: "Withdrew successfully completed", status: "Completed", userId: doc.userId, type: "withdrew" })
+                                    createNotification.save().then(async () => {
+                                        await client.createNotification(notification)
+                                        res.status(200).send({
+                                            message: "Withdrew successfully completed",
+                                            data: doc
+                                        })
+                                    })
+                                }
+                                else {
+                                    console.log(err);
+                                }
+                            })
                         })
-                    })
+                    } catch (error) {
+
+                    }
+
+
                 }
             })
         }

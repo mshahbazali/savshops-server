@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const { me, check, upload, signup, signin, forgotpassword, updatepassword, sendotp, checkotp, updateprofile, deleteuser } = require("../../controller/auth")
+const { me, check, upload, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser } = require("../../controller/auth")
 
 
 
@@ -36,9 +36,6 @@ router.post("/signin", signin)
 
 // Update Profile Api
 router.post("/updateprofile", updateprofile)
-
-// Forgot Password Api
-router.post("/forgotpassword", forgotpassword)
 
 // Update Password Api
 router.post("/updatepassword", updatepassword)

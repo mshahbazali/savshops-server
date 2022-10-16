@@ -75,12 +75,14 @@ const signin = async (req, res) => {
                 }
                 else {
                     await bcrypt.compare(req.body.password, user.password).then(async (pass) => {
+                        console.log(pass);
                         if (pass) {
                             const token = await jwt.sign(user._id.toString(), process.env.JWT_KEY)
                             res.status(201).send({
                                 message: "Account successfully logged",
                                 token: token,
-                                userId: user._id.toString()
+                                userId: user._id.toString(),
+                                user: user
                             })
                         }
                         else {
@@ -102,37 +104,37 @@ const signin = async (req, res) => {
     }
 
 }
-// Forgot Password Controller 
-const forgotpassword = async (req, res) => {
-    const { email, purpose } = req.body
-    if (purpose == 0) {
-        const randomNumber = 100000 + Math.floor(Math.random() * 899999)
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER,
-            subject: 'Sending Email using Node.js[nodemailer]',
-            text: `OTP is ${randomNumber}`
-        }, function (error, info) {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
-        const data = {
-            email: email,
-            OTP: randomNumber,
-            purpose: purpose == 0 ? "Sign Up" : "Forgot Password"
-        }
+// // Forgot Password Controller 
+// const forgotpassword = async (req, res) => {
+//     const { email, purpose } = req.body
+//     if (purpose == 0) {
+//         const randomNumber = 100000 + Math.floor(Math.random() * 899999)
+//         transporter.sendMail({
+//             from: process.env.EMAIL_USER,
+//             to: process.env.EMAIL_USER,
+//             subject: 'Sending Email using Node.js[nodemailer]',
+//             text: `OTP is ${randomNumber}`
+//         }, function (error, info) {
+//             if (error) {
+//                 console.log(error);
+//             } else {
+//                 console.log('Email sent: ' + info.response);
+//             }
+//         });
+//         const data = {
+//             email: email,
+//             OTP: randomNumber,
+//             purpose: purpose == 0 ? "Sign Up" : "Forgot Password"
+//         }
 
-        const addOtp = await otpSchema(data)
-        addOtp.save().then((message) => {
-            res.status(201).send({
-                message: "OTP SENDED"
-            })
-        })
-    }
-}
+//         const addOtp = await otpSchema(data)
+//         addOtp.save().then((message) => {
+//             res.status(201).send({
+//                 message: "OTP SENDED"
+//             })
+//         })
+//     }
+// }
 // Update Password Controller 
 const updatepassword = async (req, res) => {
     try {
@@ -185,6 +187,7 @@ const updateprofile = async (req, res) => {
 // Send Otp Controller 
 const sendotp = async (req, res) => {
     const { email, purpose } = req.body
+    console.log(email)
     const randomNumber = 100000 + Math.floor(Math.random() * 899999)
     transporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -218,7 +221,9 @@ const checkotp = async (req, res) => {
         await otpSchema.findOne({ OTP: OTP })
             .then(async (user) => {
                 if (!user) {
-                    res.status(202).send("Wrong OTP")
+                    res.status(202).send({
+                        message: "Wrong OTP"
+                    })
                 }
                 else {
                     let expireTime = 10 * 60 * 1000
@@ -339,7 +344,7 @@ const me = async (req, res) => {
 
 }
 
-module.exports = { me, check, signup, signin, forgotpassword, updatepassword, sendotp, checkotp, updateprofile, deleteuser, upload }
+module.exports = { me, check, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser, upload }
 
 
 
