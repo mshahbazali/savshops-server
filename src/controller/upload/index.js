@@ -1,6 +1,5 @@
 const fs = require("fs")
 const ImageKit = require("imagekit");
-const { authSchema } = require("../../schema/auth")
 const upload = async (req, res) => {
     var imagekit = new ImageKit({
         publicKey: process.env.imageKitPub,

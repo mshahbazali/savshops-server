@@ -1,7 +1,5 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { google } = require('googleapis')
-const fs = require("fs")
 const { authSchema, otpSchema } = require("../../schema/auth")
 const nodemailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
@@ -13,6 +11,18 @@ const transporter = nodemailer.createTransport(smtpTransport({
         pass: process.env.EMAIL_HASH
     }
 }));
+
+
+
+
+const admin = async (req, res) => {
+    await authSchema.find({}).then((data) => {
+        res.status(200).send({
+            data
+        })
+    })
+
+}
 
 // Check Auth User 
 
@@ -35,7 +45,7 @@ const check = async (req, res) => {
 // Sign Up Controller 
 const signup = async (req, res) => {
     try {
-        const { referralCode, email } = req.body
+        const { referralCode } = req.body
         let user = await authSchema.findOne({ email: req.body.email });
         if (user) {
             return res.send('That user already exisits!');
@@ -104,50 +114,42 @@ const signin = async (req, res) => {
     }
 
 }
-// // Forgot Password Controller 
-// const forgotpassword = async (req, res) => {
-//     const { email, purpose } = req.body
-//     if (purpose == 0) {
-//         const randomNumber = 100000 + Math.floor(Math.random() * 899999)
-//         transporter.sendMail({
-//             from: process.env.EMAIL_USER,
-//             to: process.env.EMAIL_USER,
-//             subject: 'Sending Email using Node.js[nodemailer]',
-//             text: `OTP is ${randomNumber}`
-//         }, function (error, info) {
-//             if (error) {
-//                 console.log(error);
-//             } else {
-//                 console.log('Email sent: ' + info.response);
-//             }
-//         });
-//         const data = {
-//             email: email,
-//             OTP: randomNumber,
-//             purpose: purpose == 0 ? "Sign Up" : "Forgot Password"
-//         }
 
-//         const addOtp = await otpSchema(data)
-//         addOtp.save().then((message) => {
-//             res.status(201).send({
-//                 message: "OTP SENDED"
-//             })
-//         })
-//     }
-// }
 // Update Password Controller 
 const updatepassword = async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, Number(process.env.HASH))
-        await authSchema.findOneAndUpdate({ email: req.body.email }, { $set: { password: hash } }, { new: true }, (err, user) => {
-            if (err) {
+        await authSchema.findOneAndUpdate({ email: req.body.email }, { $set: { password: hash } }, { new: true }).then((user) => {
+            if (user) {
+                res.status(201).send({
+                    message: "Your password updated",
+                    user: user
+                })
+            }
+            else {
+                res.status(201).send({
+                    message: "Something wrong",
+                })
+            }
+        })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+// Update Profile Controller 
+const updateprofile = async (req, res) => {
+    try {
+        await authSchema.findByIdAndUpdate({ _id: req.id }, req.body, { new: true }).then((user) => {
+            if (!user) {
                 res.status(201).send({
                     message: "Something wrong",
                 })
             }
             else {
                 res.status(201).send({
-                    message: "Your password updated",
+                    message: "Your profile updated",
                     user: user
                 })
             }
@@ -157,37 +159,10 @@ const updatepassword = async (req, res) => {
         console.log(err)
     }
 }
-// Update Profile Controller 
-const updateprofile = async (req, res) => {
-    try {
-        const { token } = req.headers
-        await jwt.verify(token, process.env.JWT_KEY, async (err, _id) => {
-            await authSchema.findByIdAndUpdate({ _id }, req.body, { new: true }, (err, user) => {
-                if (err) {
-                    res.status(201).send({
-                        message: "Something wrong",
-                    })
-                }
-                else {
-                    res.status(201).send({
-                        message: "Your profile updated",
-                        user: user
-                    })
-                }
-            })
-        })
-
-
-    }
-    catch (err) {
-        console.log(err)
-    }
-}
 
 // Send Otp Controller 
 const sendotp = async (req, res) => {
     const { email, purpose } = req.body
-    console.log(email)
     const randomNumber = 100000 + Math.floor(Math.random() * 899999)
     transporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -264,71 +239,8 @@ const deleteuser = async (req, res) => {
     }
 }
 
-const upload = (req, res) => {
-    try {
-        console.log(req.file);
-        const oauth2Client = new google.auth.OAuth2(
-            "832638247811-hava2blgf6heqep137q0h1mgpnp362h3.apps.googleusercontent.com",
-            "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",
-            "https://developers.google.com/oauthplayground"
-        );
-        const drive = google.drive({
-            version: 'v3',
-            auth: oauth2Client
-        });
-        const fileMetadata = {
-            name: req.file.filename,
-        };
-        const media = {
-            mimeType: req.file.type,
-            body: fs.createReadStream(req.file.path),
-        };
-        oauth2Client.setCredentials({
-            access_token: 'ya29.A0AVA9y1tlH3C4oej6EQ5G8Tp2Msyn6I31vdi0qBHjijsa2ys355mZw9WV43kbqknQrOjUW8Xgq5cVXtMws_G9C-3uFiKG7slzcODD-dEb_apB_W7m0pxNh_VSGOCE_9aooBofjtJXwWr8lY389nU1GlAyVE1vYUNnWUtBVEFTQVRBU0ZRRTY1ZHI4cUhCWjZFUmNlWDJkdTdjU0J6OGNyUQ0163',
-            refresh_token: '1//04dLeLg6thapbCgYIARAAGAQSNwF-L9IrwffYNZu0VIdpbTgXmNY_zcHtAkY4ReGeZtznDMIwEcaRY0_KupmDdm6iefXff7vpTyQ',
-            expiry_date: true
-        });
-        drive.files.create(
-            {
-                resource: fileMetadata,
-                media: media,
-                fields: 'id',
-            },
-            async (err, file) => {
-                await drive.permissions.create({
-                    fileId: file.data.id,
-                    requestBody: {
-                        role: "reader",
-                        type: "anyone"
-                    }
-                })
-                const result = await drive.files.get({
-                    fileId: file.data.id,
-                    fields: "webViewLink , webContentLink",
-                });
-                if (err) {
-                    // Handle error
-                    console.log(err);
-                } else {
-                    fs.unlinkSync(req.file.path);
-                    console.log(file.data.id)
-                    res.status(200).send({ fileId: file.data.id });
-                }
-            }
-        );
-
-        // res.send({ "hello": "resFile.data" })
-    }
-    catch (e) {
-        console.log(e)
-        res.status(500).send(e)
-    }
-}
-
 const me = async (req, res) => {
-    const { token } = req.headers
-    await jwt.verify(token, process.env.JWT_KEY, async (err, _id) => {
-        const user = await authSchema.findById({ _id })
+    await authSchema.findById({ _id: req.id }).then((user) => {
         if (user) {
             res.status(201).send({
                 user: user
@@ -340,11 +252,9 @@ const me = async (req, res) => {
             })
         }
     })
-
-
 }
 
-module.exports = { me, check, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser, upload }
+module.exports = { admin, me, check, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser }
 
 
 

@@ -1,29 +1,8 @@
 const express = require("express")
 const router = express.Router()
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
-const { me, check, upload, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser } = require("../../controller/auth")
-
-
-
-const DIR = './public/';
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, DIR);
-    },
-    filename: (req, file, cb) => {
-        const fileName = file.originalname.toLowerCase().split(' ').join('-');
-        cb(null, uuidv4() + '-' + fileName)
-    }
-});
-var uploadFile = multer({
-    storage: storage,
-});
-
-
-
-
+const { admin, me, check, signup, signin, updatepassword, sendotp, checkotp, updateprofile, deleteuser } = require("../../controller/auth")
+const { auth } = require("../../middleware/auth")
+const { keyCheck } = require("../../middleware/keyCheck")
 
 // Check Api
 router.post("/check", check)
@@ -35,7 +14,7 @@ router.post("/signup", signup)
 router.post("/signin", signin)
 
 // Update Profile Api
-router.post("/updateprofile", updateprofile)
+router.post("/updateprofile", auth, updateprofile)
 
 // Update Password Api
 router.post("/updatepassword", updatepassword)
@@ -50,10 +29,10 @@ router.post("/checkotp", checkotp)
 router.post("/delete", deleteuser)
 
 // Me User Api
-router.get("/me", me)
+router.get("/me", auth, me)
 
-// Upload Image Api
-router.post("/upload", uploadFile.single("image"), upload)
+// Admin Api
+router.get("/admin", keyCheck, admin)
 
 module.exports = router
 

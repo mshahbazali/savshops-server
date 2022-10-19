@@ -3,26 +3,28 @@ const router = express.Router()
 
 
 const { approve, reject, getBrand, createRequest, getRequest } = require("../../controller/request")
+const { auth } = require("../../middleware/auth")
+const { keyCheck } = require("../../middleware/keyCheck")
 
 // Create Request Api
 
-router.post("/create", createRequest)
+router.post("/create", auth, createRequest)
 
 // Get Request Api
 
-router.get("/get", getRequest)
+router.get("/get", auth, getRequest)
 
 // Get Brand Api
 
-router.get("/brand", getBrand)
+router.get("/brand", auth, getBrand)
 
 // Approve Request Api
 
-router.get("/approve", approve)
+router.post("/approve", keyCheck, approve)
 
 // Reject Request Api
 
-router.get("/reject", reject)
+router.post("/reject", keyCheck, reject)
 
 
 module.exports = router

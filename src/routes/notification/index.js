@@ -1,11 +1,11 @@
 const express = require("express")
 const router = express.Router()
-
 const { get } = require("../../controller/notification")
+const { auth } = require("../../middleware/auth")
 
 // Get Notification Api
 
-router.get("/get", get)
+router.get("/get", auth, get)
 
 
 

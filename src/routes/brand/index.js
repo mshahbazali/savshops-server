@@ -2,31 +2,32 @@ const express = require("express")
 const router = express.Router()
 
 const { createBrand, getAllBrand, getBrand, updateBrand, deleteBrand, getBrandData } = require("../../controller/brand")
+const { keyCheck } = require("../../middleware/keyCheck")
 
 // Get All Brand Api
 
-router.get("/all", getAllBrand)
+router.get("/all", keyCheck, getAllBrand)
 
 // Get  Brand Api
 
-router.get("/get", getBrand)
+router.get("/get", keyCheck, getBrand)
 
 // Create Brand Api
 
-router.post("/create", createBrand)
+router.post("/create", keyCheck, createBrand)
 
 
 // Update Brand Api
 
-router.post("/update", updateBrand)
+router.post("/update", keyCheck, updateBrand)
 
 // Delete Brand Api
 
-router.post("/delete", deleteBrand)
+router.post("/delete", keyCheck, deleteBrand)
 
 // Get Brand Data Api
 
-router.get("/data", getBrandData)
+router.get("/data", keyCheck, getBrandData)
 
 
 module.exports = router

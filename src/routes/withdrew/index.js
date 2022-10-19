@@ -2,22 +2,24 @@ const express = require("express")
 const router = express.Router()
 
 const { approve, reject, create, get } = require("../../controller/withdrew")
+const { auth } = require("../../middleware/auth")
+const { keyCheck } = require("../../middleware/keyCheck")
 
 // Create Withdrew Api
 
-router.post("/create", create)
+router.post("/create", auth, create)
 
 // Get Withdrew Api
 
-router.get("/get", get)
+router.get("/get", auth, get)
 
 // Approve Withdrew Api
 
-router.post("/approve", approve)
+router.post("/approve", keyCheck, approve)
 
 // Reject Withdrew Api
 
-router.post("/reject", reject)
+router.post("/reject", keyCheck, reject)
 
 
 
