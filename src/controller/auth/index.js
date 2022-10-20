@@ -165,10 +165,14 @@ const sendotp = async (req, res) => {
     const { email, purpose } = req.body
     const randomNumber = 100000 + Math.floor(Math.random() * 899999)
     transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
-        subject: 'Sending Email using Node.js[nodemailer]',
-        text: `OTP is ${randomNumber}`
+        from: {
+            name: 'SavShops Cashback',
+            address: process.env.EMAIL_USER
+        }
+        ,
+        to: email,
+        subject: 'Email Address Verification',
+        text: `Welcome to SavShops \n OTP is ${randomNumber}`
     }, function (error, info) {
         if (error) {
             console.log(error);
