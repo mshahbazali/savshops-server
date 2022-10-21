@@ -7,7 +7,7 @@ const upload = async (req, res) => {
         urlEndpoint: process.env.imageKitUrl
     });
 
-    fs.readFile(`/opt/render/project/${req.file.path}`, function (err, data) {
+    fs.readFile(`../../../${req.file.path}`, function (err, data) {
         if (err) console.log(err);; // Fail if the file can't be read.
         imagekit.upload({
             file: data,
@@ -18,7 +18,7 @@ const upload = async (req, res) => {
                 res.status(200).send({
                     url: result.url
                 });
-                fs.unlinkSync(`/opt/render/project/${req.file.path}`)
+                fs.unlinkSync(`../../../${req.file.path}`)
             }
         });
     });
