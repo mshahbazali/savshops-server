@@ -6,6 +6,7 @@ const upload = async (req, res) => {
         privateKey: process.env.imageKitPri,
         urlEndpoint: process.env.imageKitUrl
     });
+    console.log(__dirname)
 
     fs.readFile(`../../../${req.file.path}`, function (err, data) {
         if (err) console.log(err);; // Fail if the file can't be read.
