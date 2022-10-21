@@ -4,7 +4,7 @@ const { upload } = require("../../controller/upload")
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
-const DIR = './public/';
+const DIR = '/opt/render/project/public/';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
