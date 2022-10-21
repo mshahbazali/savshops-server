@@ -63,7 +63,8 @@ const signup = async (req, res) => {
                 const token = await jwt.sign(user._id.toString(), process.env.JWT_KEY)
                 res.status(200).send({
                     authMessage: "Your account was created successfully!",
-                    token: token
+                    token: token,
+                    user: user
                 });
             })
         }
