@@ -64,7 +64,7 @@ const signup = async (req, res) => {
                 res.status(200).send({
                     authMessage: "Your account was created successfully!",
                     token: token,
-                    user: user
+                    user: user,
                 });
             })
         }
