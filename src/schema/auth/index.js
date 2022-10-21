@@ -5,6 +5,7 @@ const authSchema = mongoose.model("auth", mongoose.Schema({
     password: { type: String, },
     gender: { type: String, },
     country: { type: String, },
+    countryCode: { type: String, },
     mobile: { type: String },
     profileImage: { type: String },
     verify: { type: Boolean },
